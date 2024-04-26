@@ -2,14 +2,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#define LIM1 100000000
+#define LIM1 10000
 
 void insertion_sort(int *v, size_t size);
 void initArray(int array[], int len);
 
 int main()
 {
-
   srand(time(NULL));
 
   int *auxArray = (int *)malloc(sizeof(int) * LIM1);
@@ -20,7 +19,6 @@ int main()
   clock_t start, end;
   double cpu_time_used;
 
-  // Criando arrays menores.
   initArray(array, LIM1);
   int **a = (int **)malloc(sizeof(int *) * qnt);
   for (int i = 0; i < qnt - 1; i++)
@@ -30,7 +28,6 @@ int main()
   }
   a[qnt - 1] = (int *)malloc(sizeof(int) * rest);
 
-  // Copiando o array em arrays menores.
   int u = 0;
   for (int j = 0; j < qnt - 1; j++)
   {
@@ -43,15 +40,15 @@ int main()
   {
     a[qnt - 1][k] = array[u++];
   }
+
   start = clock();
-  // Ordenando os arrays menores.
+
   for (int i = 0; i < qnt - 1; i++)
   {
     insertion_sort(a[i], tam);
   }
   insertion_sort(a[qnt - 1], rest);
 
-  // Criando indices para o final de cada array.
   int indexs[qnt];
   for (int i = 0; i < qnt - 1; i++)
   {
@@ -59,7 +56,6 @@ int main()
   }
   indexs[qnt - 1] = rest - 1;
 
-  // Verificando o maior deles e colocando no array auxiliar, atualizando os indices.
   int auxArrayIndex = LIM1 - 1;
   while (auxArrayIndex >= 0)
   {
@@ -83,6 +79,12 @@ int main()
   cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 
   printf("%f\n", cpu_time_used);
+
+  /*for (int i = 0; i < LIM1; i++)
+  {
+    printf("%d ", auxArray[i]);
+  }
+  puts("");*/
 
   for (int i = 0; i < qnt; i++)
   {

@@ -2,11 +2,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#define LIM1 100000000
+#define LIM1 1000000
 
 void initArray(int array[], int len);
 static void heapify(int *v, size_t i, size_t size);
 static void make_heap(int *v, size_t size);
+void heap_insert(int *v, int *size, int element);
+void heap_pop(int *v, int *size);
 
 int main()
 {
@@ -23,7 +25,6 @@ int main()
   clock_t start, end;
   double cpu_time_used;
 
-  // Criando arrays menores.
   initArray(array, LIM1);
   int **a = (int **)malloc(sizeof(int *) * qnt);
   for (int i = 0; i < qnt - 1; i++)
@@ -33,7 +34,6 @@ int main()
   }
   a[qnt - 1] = (int *)malloc(sizeof(int) * rest);
 
-  // Copiando o array em arrays menores.
   int u = 0;
   for (int j = 0; j < qnt - 1; j++)
   {
@@ -57,15 +57,40 @@ int main()
 
   for (int i = 0; i < qnt - 1; i++)
   {
+    maxArray[i] = a[i][0];
     arrayIndex[i] = tam;
-    maxArray[i] = heap_pop(a[i], &arrayIndex[i]);
   }
+  maxArray[qnt - 1] = a[qnt - 1][0];
   arrayIndex[qnt - 1] = rest;
-  maxArray[qnt - 1] = heap_pop(a[qnt - 1], &arrayIndex[qnt - 1]);
   make_heap(maxArray, qnt);
-  int flag = qnt-1;
-  auxArray[flag--] = heap_pop(maxArray, &qnt);
+  int flag = LIM1 - 1;
+  int maxIndex = qnt;
+  auxArray[flag--] = maxArray[0];
 
+  while (flag >= 0)
+  {
+    for (int i = 0; i < qnt; i++)
+    {
+      if (maxArray[0] == a[i][0])
+      {
+        if (arrayIndex[i] > 0)
+        {
+          heap_pop(maxArray, &maxIndex);
+          heap_pop(a[i], &arrayIndex[i]);
+          int elem = a[i][0];
+          heap_insert(maxArray, &maxIndex, elem);
+          auxArray[flag--] = maxArray[0];
+          break;
+        }
+        else
+        {
+          heap_pop(maxArray, &maxIndex);
+          auxArray[flag--] = maxArray[0];
+          break;
+        }
+      }
+    }
+  }
   end = clock();
   cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 
@@ -129,45 +154,29 @@ static void make_heap(int *v, size_t size)
   }
 }
 
-int heap_pop(int *v, size_t *size)
+void heap_pop(int *v, int *size)
 {
-  if (*size == 0)
-    return -1; // If the heap is empty, return -1 or some invalid value
 
-  // Save the root of the heap
-  int root = v[0];
-
-  // Swap the root with the last element
   v[0] = v[*size - 1];
 
-  // Decrease the size of the heap
   (*size)--;
 
-  // Sift down the new root to its proper position
   heapify(v, 0, *size);
-
-  // Return the removed element
-  return root;
 }
 
-void heap_insert(int *v, size_t *size, int element)
+void heap_insert(int *v, int *size, int element)
 {
-  // Add the new element to the end of the heap
   v[*size] = element;
 
-  // Increase the size of the heap
   (*size)++;
 
-  // Sift up the new element to its proper position
   size_t i = *size - 1;
   while (i > 0 && v[i] > v[(i - 1) / 2])
   {
-    // Swap the element with its parent
     int temp = v[i];
     v[i] = v[(i - 1) / 2];
     v[(i - 1) / 2] = temp;
 
-    // Move to the parent
     i = (i - 1) / 2;
   }
 }
