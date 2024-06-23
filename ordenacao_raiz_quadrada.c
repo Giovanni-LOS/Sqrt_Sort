@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#define LIM1 10000
+#define LIM1 100000000
 
 void insertion_sort(int *v, size_t size);
 void initArray(int array[], int len);
